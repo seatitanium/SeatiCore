@@ -16,6 +16,7 @@ public class SeatiCore {
     public static int uptime = 0;
     public static boolean ready = false;
     public static MinecraftServer server;
+    public static Server http;
     private static final Logger LOGGER = LogUtils.getLogger();
 
     @SuppressWarnings("BusyWait")
@@ -31,8 +32,11 @@ public class SeatiCore {
         }
     });
 
+    // TODO: fix spark not included in package.
+
     public SeatiCore() {
         timerThread.start();
+        http = new Server(9090, "<b>hi</b>");
         MinecraftForge.EVENT_BUS.register(Events.class);
         ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true));
     }
