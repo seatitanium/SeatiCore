@@ -15,6 +15,7 @@ public class Events {
     @SubscribeEvent
     public static void serverStarting(ServerStartingEvent e) {
         Utils.log.info("""
+                   
                    _____            __  _\s
                   / ___/___  ____ _/ /_(_)
                   \\__ \\/ _ \\/ __ `/ __/ /\s
