@@ -8,7 +8,8 @@ import java.nio.file.Files;
 import java.util.List;
 
 public class Log {
-    public static final String logDir = "./seatic/logs/";
+    public static final String logDir = Utils.files.cwd + "/seatic/logs/";
+    public static String dateStrFile;
     public static String dateStr;
     public static File currentLogFile;
 
@@ -18,16 +19,18 @@ public class Log {
     }
 
     private void initFiles() {
-        var filename = String.format("logs-%s.log", dateStr);
+        var filename = String.format("logs-%s.log", dateStrFile);
         try {
+            Utils.logger.error(logDir);
+            Utils.logger.error(logDir + filename);
             if (!Utils.files.mkdir(logDir)) {
-                Utils.log.error("Error in Log::initFiles - Cannot create log directories.");
+                Utils.logger.error("Error in Log::initFiles - Cannot create log directories.");
             }
             if (!Utils.files.touch(logDir + filename)) {
-                Utils.log.error("Error in Log::initFiles - Cannot create latest log file.");
+                Utils.logger.error("Error in Log::initFiles - Cannot create latest log file.");
             }
         } catch (IOException e) {
-            Utils.log.error("IOException in Log::initFiles - Details: " + e.getMessage());
+            Utils.logger.error("IOException in Log::initFiles - Details: " + e.getMessage());
             e.printStackTrace();
         }
         // be sure to modify the cursor variable.
@@ -36,6 +39,7 @@ public class Log {
 
     private void updateDate() {
         dateStr = Utils.format.getFormattedDate();
+        dateStrFile = Utils.format.getFormattedDateForFile();
     }
 
     public int getLines() {
@@ -46,10 +50,10 @@ public class Log {
             reader.close();
             return totalLines;
         } catch (FileNotFoundException e) {
-            Utils.log.error("Critical: Cannot reinitialize files after some log file was deleted. Message: " + e.getMessage());
+            Utils.logger.error("Critical: Cannot reinitialize files after some log file was deleted. Message: " + e.getMessage());
             e.printStackTrace();
         } catch (IOException e) {
-            Utils.log.error("IOException in Log::checkLineLimit - Cannot read lines.");
+            Utils.logger.error("IOException in Log::checkLineLimit - Cannot read lines.");
             e.printStackTrace();
         }
         return 0;
