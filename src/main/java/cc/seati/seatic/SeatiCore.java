@@ -34,6 +34,7 @@ public class SeatiCore {
 
     // TODO: fix spark not included in package.
 
+    @SuppressWarnings("")
     public SeatiCore() {
         timerThread.start();
         http = new Server(9090, "<b>hi</b>");

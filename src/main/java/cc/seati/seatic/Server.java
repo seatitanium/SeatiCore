@@ -16,18 +16,19 @@ public class Server {
     public static String indexPageStr;
 
     public Server(int p, String indexPage) {
-        Utils.log.info("Starting initial web server - powered by Spark.");
+        Utils.log.info("Starting internal web server - powered by Spark.");
         indexPageStr = indexPage;
         port(p);
+        error();
         initExceptionHandler((e) -> Utils.log.error("HTTP 服务出现问题：" + e.getMessage()));
         after((Filter) (request, response) -> {
             response.header("Access-Control-Allow-Origin", "*");
             response.header("Access-Control-Allow-Methods", "GET,POST");
         });
+        map();
     }
 
-
-    public static void error() {
+    public void error() {
         notFound((req, res) -> {
             res.type("application/json");
             return ng("http-404");
@@ -42,11 +43,11 @@ public class Server {
         });
     }
 
-    public static void stop() {
+    public void stop() {
         Spark.stop();
     }
 
-    public static void map() {
+    public void map() {
         if (indexPageStr != null) {
             get("/", (req, res) -> {
                 res.type("text/html");
