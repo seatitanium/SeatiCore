@@ -33,13 +33,20 @@ public class Utils {
 
     public static class format {
         public static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        public static final SimpleDateFormat sdfFile = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss");
 
         public static String getFormattedDate() {
             return sdf.format(new Date());
         }
+
+        public static String getFormattedDateForFile() {
+            return sdfFile.format(new Date());
+        }
     }
 
     public static class files {
+        public static final String cwd = System.getProperty("user.dir");
+
         public static boolean touch(String url) throws IOException {
             var file = new File(url);
             if (!file.exists()) {
