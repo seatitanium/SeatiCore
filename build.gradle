@@ -3,6 +3,7 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 version = mod_version
@@ -12,10 +13,15 @@ base {
     archivesName = mod_id
 }
 
-
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+
+configurations {
+    shade
+    shade.extendsFrom(implementation)
+}
+
 minecraft {
     mappings channel: mapping_channel, version: mapping_version
     copyIdeResources = true
@@ -34,7 +40,7 @@ minecraft {
             }
         }
         client {
-            
+
             property 'forge.enabledGameTestNamespaces', mod_id
         }
 
@@ -59,23 +65,27 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
     maven { name 'Sonatype'; url 'https://oss.sonatype.org/content/groups/public' }
+    maven { name = 'MinecraftForge'; url = 'https://maven.minecraftforge.net/' }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    implementation group: 'org.json', name: 'json', version: '20230618'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.20.0'
-    implementation group: 'com.sparkjava', name: 'spark-core', version: '2.9.4'
-    implementation group: 'com.github.oshi', name: 'oshi-core', version: '6.4.3'
+    shade group: 'org.json', name: 'json', version: '20230618'
+    minecraftLibrary group: 'org.json', name: 'json', version: '20230618'
+    shade "group": "com.sparkjava", "name": "spark-core", "version": "2.9.4"
+    minecraftLibrary "group": "com.sparkjava", "name": "spark-core", "version": "2.9.4"
+    shade "group": "com.github.oshi", "name": "oshi-core", "version": "6.4.3"
+    minecraftLibrary "group": "com.github.oshi", "name": "oshi-core", "version": "6.4.3"
 }
 
 tasks.named('processResources', ProcessResources).configure {
     var replaceProperties = [
-            minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
-            forge_version: forge_version, forge_version_range: forge_version_range,
+            minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
+            forge_version       : forge_version, forge_version_range: forge_version_range,
             loader_version_range: loader_version_range,
-            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
-            mod_authors: mod_authors, mod_description: mod_description,
+            mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+            mod_authors         : mod_authors, mod_description: mod_description,
     ]
     inputs.properties replaceProperties
 
@@ -86,11 +96,12 @@ tasks.named('processResources', ProcessResources).configure {
 
 
 tasks.named('jar', Jar).configure {
+    archiveClassifier.set('slim')
     manifest {
         attributes([
                 'Specification-Title'     : mod_id,
                 'Specification-Vendor'    : mod_authors,
-                'Specification-Version'   : '1', 
+                'Specification-Version'   : '1',
                 'Implementation-Title'    : project.name,
                 'Implementation-Version'  : project.jar.archiveVersion,
                 'Implementation-Vendor'   : mod_authors,
@@ -98,8 +109,19 @@ tasks.named('jar', Jar).configure {
         ])
     }
 
-    
     finalizedBy 'reobfJar'
+}
+
+shadowJar {
+    archiveClassifier.set('')
+    configurations = [project.configurations.shade]
+    finalizedBy 'reobfShadowJar'
+}
+
+assemble.dependsOn shadowJar
+
+reobf {
+    shadowJar {}
 }
 
 publishing {
@@ -116,5 +138,5 @@ publishing {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8' 
+    options.encoding = 'UTF-8'
 }
