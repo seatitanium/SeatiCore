@@ -68,6 +68,7 @@ public class Server {
         }
         path("/api", () -> {
             before("/*", (q, a) -> {
+                a.type("application/json");
                 // pathInfo example return: /example/foo
                 Utils.fileLogger.info(String.format("access %s", q.pathInfo()));
             });
