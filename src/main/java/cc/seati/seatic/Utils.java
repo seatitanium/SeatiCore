@@ -88,7 +88,7 @@ public class Utils {
             var object = new JSONObject();
             object.put("state", state.toString());
             object.put("msg", msg);
-            object.put("data", data.toString());
+            object.put("data", data);
             return object;
         }
 
