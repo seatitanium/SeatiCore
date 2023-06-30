@@ -32,8 +32,8 @@ public class Utils {
     }
 
     public static class format {
-        public static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-        public static final SimpleDateFormat sdfFile = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss");
+        public static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        public static final SimpleDateFormat sdfFile = new SimpleDateFormat("yyyy-MM-dd@HH_mm_ss");
 
         public static String getFormattedDate() {
             return sdf.format(new Date());
