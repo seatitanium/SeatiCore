@@ -4,21 +4,21 @@ import cc.seati.seatic.API.ServerApi;
 import spark.Filter;
 import spark.Spark;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
 
 import static cc.seati.seatic.Utils.resp.ng;
 import static spark.Spark.*;
 
 public class Server {
-    public static String indexPageStr;
+    public static String indexPageStr = "";
 
-    public Server(int p, String indexPage) {
+    public Server(int p) {
         Utils.log.info("Starting internal web server - powered by Spark.");
-        indexPageStr = indexPage;
         port(p);
+        initIndex();
         error();
         initExceptionHandler((e) -> Utils.log.error("HTTP 服务出现问题：" + e.getMessage()));
         after((Filter) (request, response) -> {
@@ -26,6 +26,18 @@ public class Server {
             response.header("Access-Control-Allow-Methods", "GET,POST");
         });
         map();
+    }
+
+    public void initIndex() {
+        var index = new File(Utils.files.cwd  + "/seatic/index.html");
+        if (index.exists()) {
+            try {
+                indexPageStr = Files.readString(index.toPath());
+            } catch (IOException | InvalidPathException e) {
+                e.printStackTrace();
+                Utils.log.error("Error in initIndex: cannot read index.html.");
+            }
+        }
     }
 
     public void error() {
@@ -51,14 +63,7 @@ public class Server {
         if (indexPageStr != null) {
             get("/", (req, res) -> {
                 res.type("text/html");
-                try {
-                    return Files.readString(Path.of(indexPageStr));
-                } catch (InvalidPathException | IOException e) {
-                    Utils.log.warn("Index page is not found. Returning 404.");
-                    halt(404);
-                    e.printStackTrace();
-                }
-                return null;
+                return indexPageStr;
             });
         }
         path("/api", () -> {
