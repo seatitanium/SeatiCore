@@ -21,7 +21,8 @@ public class Events {
                   \\__ \\/ _ \\/ __ `/ __/ /\s
                  ___/ /  __/ /_/ / /_/ / \s
                 /____/\\___/\\__,_/\\__/_/  \s
+                
+                SeatiCore - v1.0.0
                 """);
-        Utils.log.info("SeatiCore - v1.0.0");
     }
 }
