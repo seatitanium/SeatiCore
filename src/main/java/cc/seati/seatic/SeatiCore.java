@@ -32,12 +32,9 @@ public class SeatiCore {
         }
     });
 
-    // TODO: fix spark not included in package.
-
-    @SuppressWarnings("")
     public SeatiCore() {
         timerThread.start();
-        http = new Server(9090, "<b>hi</b>");
+        http = new Server(9090);
         MinecraftForge.EVENT_BUS.register(Events.class);
         ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true));
     }

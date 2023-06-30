@@ -19,7 +19,7 @@ public class Log {
     }
 
     private void initFiles() {
-        var filename = String.format("logs-%s.log", dateStrFile);
+        var filename = String.format("%s.log", dateStrFile);
         try {
             Utils.logger.error(logDir);
             Utils.logger.error(logDir + filename);
