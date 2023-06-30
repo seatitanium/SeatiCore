@@ -33,7 +33,7 @@ public class ServerApi {
 
     public static @NotNull JSONObject getVersion(Request q, Response a) {
         var mcAndForgeVersion = FMLLoader.versionInfo().mcAndForgeVersion();
-        return buildResponse(State.OK, "", new JSONObject(mcAndForgeVersion));
+        return buildResponse(State.OK, "", mcAndForgeVersion);
     }
 
 }
