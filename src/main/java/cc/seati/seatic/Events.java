@@ -9,7 +9,7 @@ public class Events {
     public static void serverStarted(ServerStartedEvent e) {
         SeatiCore.server = e.getServer();
         SeatiCore.ready = true;
-        Utils.log.info("Got server instance.");
+        Utils.log.info("SeatiCore has got the server instance.");
     }
 
     @SubscribeEvent
