@@ -91,7 +91,7 @@ public class ServerApi {
     }
 
     public static JSONObject getMods(Request q, Response a) {
-        var modIds = ModList.get().getMods().stream().map(IModInfo::getModId).toList();
+        var modIds = ModList.get().getMods().stream().map(IModInfo::getDisplayName).toList();
         return buildResponse(State.OK, "", new JSONObject(modIds));
     }
 
