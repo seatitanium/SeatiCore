@@ -39,7 +39,7 @@ public class ServerApi {
         public static JSONObject getPlayerDetails(ServerPlayer p) {
             var objectMain = new JSONObject();
             /* objectMain construction */
-            objectMain.put("name", p.getName());
+            objectMain.put("name", p.getGameProfile().getName());
             objectMain.put("lastActionTime", p.getLastActionTime());
             objectMain.put("uuid", p.getStringUUID());
             objectMain.put("online", !p.hasDisconnected());
@@ -122,7 +122,7 @@ public class ServerApi {
         var list = util.getOnlinePlayerList();
         var result = new JSONObject();
         for (var p : list) {
-            result.put(p.getName().getString(), util.getPlayerDetails(p));
+            result.put(p.getGameProfile().getName(), util.getPlayerDetails(p));
         }
         return buildResponse(State.OK, "", result);
     }
