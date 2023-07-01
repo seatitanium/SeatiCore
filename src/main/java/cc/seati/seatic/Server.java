@@ -1,5 +1,6 @@
 package cc.seati.seatic;
 
+import cc.seati.seatic.API.DeviceApi;
 import cc.seati.seatic.API.ServerApi;
 import spark.Filter;
 import spark.Spark;
@@ -9,7 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 
-import static cc.seati.seatic.Utils.resp.ng;
+import static cc.seati.seatic.Utils.resp.*;
 import static spark.Spark.*;
 
 public class Server {
@@ -74,9 +75,16 @@ public class Server {
             });
             path("/server", () -> {
                 get("/uptime", ServerApi::getUptime);
-                get("/count-players", ServerApi::getPlayerCount);
+                get("/count-online-players", ServerApi::getOnlinePlayerCount);
+                get("/count-total-players", ServerApi::getTotalPlayerCount);
                 get("/mods", ServerApi::getMods);
                 get("/version", ServerApi::getVersion);
+                get("/player-list", ServerApi::getOnlinePlayerList);
+            });
+            path("/device", () -> {
+                get("/tps", DeviceApi::getTps);
+                get("/ramload", DeviceApi::ramLoad);
+                get("/cpuload", DeviceApi::cpuLoad);
             });
         });
     }

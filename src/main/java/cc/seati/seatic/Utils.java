@@ -2,17 +2,111 @@ package cc.seati.seatic;
 
 import cc.seati.seatic.Enums.State;
 import com.mojang.logging.LogUtils;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraftforge.server.command.ForgeCommand;
 import org.json.JSONObject;
 import org.slf4j.Logger;
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.GlobalMemory;
+import oshi.hardware.HardwareAbstractionLayer;
+import oshi.software.os.OperatingSystem;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 
 public class Utils {
     public static final Logger logger = LogUtils.getLogger();
     public static final Log fileLogger = new Log();
+
+    @SuppressWarnings("BusyWait")
+    public static class device {
+        public static final SystemInfo si = new SystemInfo();
+        public static final OperatingSystem os = si.getOperatingSystem();
+        public static final HardwareAbstractionLayer hal = si.getHardware();
+        public static final CentralProcessor cpu = hal.getProcessor();
+        public static final GlobalMemory ram = hal.getMemory();
+        public static double cpuLoad = 0.0;
+        public static long serverUptime = 0;
+        public static Thread cpuLoadCalcThread;
+        public static Thread uptimeCalcThread;
+
+        private static void startUptimeCalc() {
+            uptimeCalcThread = new Thread(() -> {
+                try {
+                    while (true) {
+                        Thread.sleep(1000);
+                        serverUptime++;
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Utils.log.error("Uptime calculation is interrupted.");
+                }
+            });
+            uptimeCalcThread.start();
+        }
+
+        private static void startCpuLoadCalc() {
+            cpuLoadCalcThread = new Thread(() -> {
+                while (true) {
+                    long[] prevTicks = cpu.getSystemCpuLoadTicks();
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    cpuLoad = cpu.getSystemCpuLoadBetweenTicks(prevTicks) * 100;
+                }
+            });
+            cpuLoadCalcThread.start();
+        }
+
+        private static long ramMax() {
+            return ram.getTotal();
+        }
+
+        private static long ramAvail() {
+            return ram.getAvailable();
+        }
+
+        private static long mean(long[] values) {
+            return Arrays.stream(values).sum() / values.length;
+        }
+
+        public static long getServerUptime() {
+            return serverUptime;
+        }
+
+        public static double getServerCPULoad() {
+            return cpuLoad;
+        }
+
+        public static double getServerRAMLoad() {
+            return (double) (1 - (ramAvail() / ramMax()));
+        }
+
+        // code from forge tps command
+        public static double getServerTps(ServerLevel dimension) {
+            var times = SeatiCore.server.getTickTime(dimension.dimension());
+            if (times == null) {
+                return 0D;
+            }
+            var meanTickTime = mean(SeatiCore.server.tickTimes) * 1.0e-6d;
+            return Math.min(1000 / meanTickTime, 20);
+        }
+
+        public static Map<String, Double> getServerTpsOfAllDimensions() {
+            var result = new HashMap<String, Double>();
+            var dims = SeatiCore.server.getAllLevels();
+            for (var l : dims) {
+                result.put(l.dimension().toString(), getServerTps(l));
+            }
+            return result;
+        }
+
+    }
 
     public static class log {
         public static void info(String str) {
@@ -45,6 +139,7 @@ public class Utils {
     }
 
     public static class files {
+        // cwd does not end with /
         public static final String cwd = System.getProperty("user.dir");
 
         public static boolean touch(String url) throws IOException {
@@ -64,6 +159,15 @@ public class Utils {
                 return dir.mkdirs();
             }
             return true;
+        }
+
+        public static int count(String url) {
+            try {
+                return Objects.requireNonNull(new File(cwd + url).list()).length;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return 0;
+            }
         }
     }
 
