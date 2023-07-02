@@ -65,7 +65,7 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
     maven { name 'Sonatype'; url 'https://oss.sonatype.org/content/groups/public' }
-    maven { name = 'MinecraftForge'; url = 'https://maven.minecraftforge.net/' }
+    maven { name 'MinecraftForge'; url 'https://maven.minecraftforge.net/' }
 }
 
 dependencies {
