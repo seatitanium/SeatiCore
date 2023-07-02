@@ -173,6 +173,14 @@ public class Utils {
     }
 
     public static class resp {
+        public static JSONObject buildResponse(State state) {
+            var object = new JSONObject();
+            object.put("state", state.toString());
+            object.put("msg", Optional.empty());
+            object.put("data", Optional.empty());
+            return object;
+        }
+
         public static JSONObject buildResponse(State state, String msg, int number) {
             var object = new JSONObject();
             object.put("state", state.toString());

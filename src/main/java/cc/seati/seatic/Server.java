@@ -87,6 +87,9 @@ public class Server {
                 get("/ramload", DeviceApi::ramLoad);
                 get("/cpuload", DeviceApi::cpuLoad);
             });
+            path("/manage", () -> {
+                get("/add-whitelist", ServerApi::addWhitelist);
+            });
         });
     }
 }

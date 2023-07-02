@@ -14,9 +14,7 @@ import org.json.JSONObject;
 import spark.Request;
 import spark.Response;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import static cc.seati.seatic.Utils.resp.*;
 
@@ -30,6 +28,20 @@ public class ServerApi {
                 return new ArrayList<>();
             }
             return server.getPlayerList().getPlayers().stream().filter(player -> !player.hasDisconnected()).toList();
+        }
+
+        public static boolean performCommand(String command) {
+            if (!serverReady) {
+                return false;
+            }
+            return SeatiCore.server.getCommands().performPrefixedCommand(
+                    SeatiCore.server.createCommandSourceStack(),
+                    command
+            ) == 1;
+        }
+
+        public static boolean setWhitelistFor(String username) {
+            return performCommand(String.format("whitelist add %s", username));
         }
 
         public static int countTotalPlayer() {
@@ -123,5 +135,19 @@ public class ServerApi {
             result.put(p.getGameProfile().getName(), util.getOnlinePlayerDetails(p));
         }
         return buildResponse(State.OK, "", result);
+    }
+
+    public static JSONObject addWhitelist(Request q, Response a) {
+        var username = q.params().get("username");
+        if (util.setWhitelistFor(username)) {
+            return buildResponse(State.OK);
+        } else {
+            return buildResponse(State.NG);
+        }
+    }
+
+    public static JSONObject dispatchCommand(Request q, Response a) {
+        var command = q.params().get("command");
+        return util.performCommand(command) ? buildResponse(State.OK) : buildResponse(State.NG);
     }
 }
