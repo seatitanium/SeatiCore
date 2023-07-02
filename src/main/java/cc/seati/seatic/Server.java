@@ -19,7 +19,7 @@ public class Server {
     public Server(int p) {
         Utils.log.info("Starting internal web server - powered by Spark.");
         port(p);
-        webSocket("/console", ChatWS.class);
+        webSocket("/console", Interactive.class);
         initIndex();
         error();
         initExceptionHandler((e) -> Utils.log.error("HTTP 服务出现问题：" + e.getMessage()));

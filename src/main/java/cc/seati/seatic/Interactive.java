@@ -12,7 +12,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @WebSocket
-public class ChatWS {
+public class Interactive {
     private static final Queue<Session> sessions = new ConcurrentLinkedQueue<>();
 
     @OnWebSocketConnect
