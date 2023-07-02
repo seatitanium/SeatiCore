@@ -39,7 +39,7 @@ public class Events {
         object.put("username", e.getUsername());
         object.put("message", e.getMessage());
         object.put("uuid", player.getStringUUID());
-        object.put("isOp", Utils.player.isOp(player));
+        object.put("isOp", Utils.server.isOpPlayer(player));
         object.put("position", posObject);
         ChatWS.sendChatMessage(object.toString());
     }

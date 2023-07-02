@@ -30,21 +30,11 @@ public class ServerApi {
             return server.getPlayerList().getPlayers().stream().filter(player -> !player.hasDisconnected()).toList();
         }
 
-        public static boolean performCommand(String command) {
-            if (!serverReady) {
-                return false;
-            }
-            return SeatiCore.server.getCommands().performPrefixedCommand(
-                    SeatiCore.server.createCommandSourceStack(),
-                    command
-            ) == 1;
-        }
-
         public static boolean setWhitelistFor(String username) {
-            return performCommand(String.format("whitelist add %s", username));
+            return Utils.server.performCommand(String.format("whitelist add %s", username));
         }
 
-        public static int countTotalPlayer() {
+        public static int countOfflinePlayer() {
             return Utils.files.count("/world/playerdata");
         }
 
@@ -55,7 +45,7 @@ public class ServerApi {
             objectMain.put("lastActionTime", p.getLastActionTime());
             objectMain.put("uuid", p.getStringUUID());
             objectMain.put("online", !p.hasDisconnected());
-            objectMain.put("isOp", Utils.player.isOp(p));
+            objectMain.put("isOp", Utils.server.isOpPlayer(p));
             try {
                 var lastDeathLoc = p.getLastDeathLocation().orElseThrow().pos();
                 objectMain.put("lastDeathLocation", String.format("(%s, %s, %s)", lastDeathLoc.getX(), lastDeathLoc.getY(), lastDeathLoc.getZ()));
@@ -120,7 +110,7 @@ public class ServerApi {
         if (!serverReady) {
             return buildResponse(State.NG, "Server is not ready.");
         }
-        return buildResponse(State.OK, "", util.countTotalPlayer());
+        return buildResponse(State.OK, "", util.countOfflinePlayer());
     }
 
     public static JSONObject getVersion(Request q, Response a) {
@@ -148,6 +138,6 @@ public class ServerApi {
 
     public static JSONObject dispatchCommand(Request q, Response a) {
         var command = q.params().get("command");
-        return util.performCommand(command) ? buildResponse(State.OK) : buildResponse(State.NG);
+        return Utils.server.performCommand(command) ? buildResponse(State.OK) : buildResponse(State.NG);
     }
 }
