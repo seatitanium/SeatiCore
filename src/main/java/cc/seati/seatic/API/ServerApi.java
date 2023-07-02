@@ -36,16 +36,14 @@ public class ServerApi {
             return Utils.files.count("/world/playerdata");
         }
 
-        public static JSONObject getPlayerDetails(ServerPlayer p) {
+        public static JSONObject getOnlinePlayerDetails(ServerPlayer p) {
             var objectMain = new JSONObject();
             /* objectMain construction */
             objectMain.put("name", p.getGameProfile().getName());
             objectMain.put("lastActionTime", p.getLastActionTime());
             objectMain.put("uuid", p.getStringUUID());
             objectMain.put("online", !p.hasDisconnected());
-            objectMain.put("isOperator",
-                    SeatiCore.server.getOperatorUserPermissionLevel()
-                            == SeatiCore.server.getProfilePermissions(p.getGameProfile()));
+            objectMain.put("isOp", Utils.player.isOp(p));
             try {
                 var lastDeathLoc = p.getLastDeathLocation().orElseThrow().pos();
                 objectMain.put("lastDeathLocation", String.format("(%s, %s, %s)", lastDeathLoc.getX(), lastDeathLoc.getY(), lastDeathLoc.getZ()));
@@ -96,7 +94,7 @@ public class ServerApi {
     }
 
     public static JSONObject getUptime(Request q, Response a) {
-        return buildResponse(State.OK, "", SeatiCore.uptime);
+        return buildResponse(State.OK, "", (int) Utils.device.getServerUptime());
     }
 
     public static JSONObject getOnlinePlayerCount(Request q, Response a) {
@@ -122,7 +120,7 @@ public class ServerApi {
         var list = util.getOnlinePlayerList();
         var result = new JSONObject();
         for (var p : list) {
-            result.put(p.getGameProfile().getName(), util.getPlayerDetails(p));
+            result.put(p.getGameProfile().getName(), util.getOnlinePlayerDetails(p));
         }
         return buildResponse(State.OK, "", result);
     }

@@ -19,21 +19,7 @@ public class SeatiCore {
     public static Server http;
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    @SuppressWarnings("BusyWait")
-    private static final Thread timerThread = new Thread(() -> {
-        while(true) {
-            uptime++;
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return;
-            }
-        }
-    });
-
     public SeatiCore() {
-        timerThread.start();
         http = new Server(9090);
         MinecraftForge.EVENT_BUS.register(Events.class);
         ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true));

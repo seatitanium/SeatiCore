@@ -3,6 +3,7 @@ package cc.seati.seatic;
 import cc.seati.seatic.Enums.State;
 import com.mojang.logging.LogUtils;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.server.command.ForgeCommand;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -209,6 +210,17 @@ public class Utils {
 
         public static String ok(String msg) {
             return buildResponse(State.OK, msg).toString();
+        }
+    }
+
+    public static class player {
+        public static boolean isOp(ServerPlayer p) {
+            if (!SeatiCore.ready) {
+                Utils.log.warn("Calling server instance before server was ready.");
+                return false;
+            }
+            return SeatiCore.server.getOperatorUserPermissionLevel()
+                    == SeatiCore.server.getProfilePermissions(p.getGameProfile());
         }
     }
 }
